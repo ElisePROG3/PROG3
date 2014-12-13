@@ -1,22 +1,27 @@
-// PROG3.cpp : Defines the entry point for the console application.
-//
-
-#include "stdafx.h"
 #include <iostream>
-#include <SDL.h>
+#include "Stain.h"
 
-
-int _tmain(int argc, _TCHAR* argv[])
+int main(int argc, char* argv[])
 {
-	if (SDL_Init(SDL_INIT_EVERYTHING) == 0){
-		std::cout << "Ok!";
-	}
-	else{
-		std::cout << "Failed!";
+	stain::Stain game = stain::Stain();
+	// Init and show loading screen
+	game.init("Game!", 800, 600);
+	game.loadImage("data/images/StudioElise.png", "splash");
+	game.showOverlay("splash");
+
+	// Load resources
+	game.loadImage("data/images/mob.png", "mob");
+
+	SDL_Event event;
+	bool quit = false;
+	while (!quit){
+		while (SDL_PollEvent(&event) != 0){
+			if (event.type == SDL_QUIT){
+				quit = true;
+			}
+		}
 	}
 
-	SDL_Delay(3000);
-	SDL_Quit();
 	return 0;
 }
 
