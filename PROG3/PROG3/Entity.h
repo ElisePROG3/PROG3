@@ -13,9 +13,10 @@ namespace stain{
 		void setX(int newX);
 		void setY(int newY);
 		SDL_Point getPos();
-		void setPos(SDL_Point newPos);
+		void setPos(SDL_Point* newPos);
 		void move(int deltaX, int deltaY);
-		void move(SDL_Point deltaPoint);
+		void move(SDL_Point* deltaPoint);
+		bool collides(Entity* entity);
 		virtual void tick()=0;
 		virtual ~Entity();
 	protected:
