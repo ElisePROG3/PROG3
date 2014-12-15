@@ -12,8 +12,6 @@ namespace stain{
 		~EntityLoot();
 	private:
 		EntityLoot(int x, int y, int size, SDL_Texture* texture);
-		SDL_Texture* hTexture;
-		void draw();
 	};
 }
 #endif

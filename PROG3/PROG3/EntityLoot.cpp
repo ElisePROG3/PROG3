@@ -2,7 +2,7 @@
 #include <string>
 
 namespace stain{
-	EntityLoot::EntityLoot(int newX, int newY, int newSize, SDL_Texture* newTexture) :Entity(newX, newY, newSize), hTexture(newTexture){
+	EntityLoot::EntityLoot(int newX, int newY, int newSize, SDL_Texture* newTexture) :Entity(newX, newY, newSize, newTexture){
 	}
 
 	EntityLoot::~EntityLoot(){
@@ -13,9 +13,6 @@ namespace stain{
 	}
 
 	void EntityLoot::tick(){
-
-	}
-	void EntityLoot::draw(){
 
 	}
 }

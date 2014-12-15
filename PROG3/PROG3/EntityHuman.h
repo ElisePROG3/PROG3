@@ -1,5 +1,5 @@
-#ifndef ENTITYLOOT_H
-#define ENTITYLOOT_H
+#ifndef ENTITYHUMAN_H
+#define ENTITYHUMAN_H
 
 #include "Entity.h"
 
@@ -12,8 +12,6 @@ namespace stain{
 		~EntityHuman();
 	private:
 		EntityHuman(int x, int y, int size, SDL_Texture* texture);
-		SDL_Texture* hTexture;
-		void draw();
 	};
 }
 #endif

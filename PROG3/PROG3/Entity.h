@@ -17,6 +17,7 @@ namespace stain{
 		void move(int deltaX, int deltaY);
 		void move(SDL_Point* deltaPoint);
 		bool collides(Entity* entity);
+		SDL_Texture* getTexture();
 		virtual void tick()=0;
 		virtual ~Entity();
 	protected:
@@ -24,12 +25,11 @@ namespace stain{
 		int y;
 		int size;
 		bool updated;
+		SDL_Texture* hTexture;
 
-		Entity(int x, int y, int size);
+		Entity(int x, int y, int size, SDL_Texture* texture = nullptr);
 		Entity(const Entity&);
 		const Entity& operator=(const Entity&);
-
-		virtual void draw()=0;
 	};
 }
 #endif

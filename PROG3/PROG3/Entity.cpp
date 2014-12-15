@@ -1,7 +1,7 @@
 #include "Entity.h"
 
 namespace stain{
-	Entity::Entity(int startX, int startY, int startSize) : x(startX), y(startY), size(startSize), updated(true){
+	Entity::Entity(int startX, int startY, int startSize, SDL_Texture* newTexture) : x(startX), y(startY), size(startSize), updated(true), hTexture(newTexture){
 
 	}
 
@@ -20,6 +20,7 @@ namespace stain{
 	void Entity::setPos(SDL_Point* newPos){ x = newPos->x; y = newPos->y; updated = true; }
 	void Entity::move(int deltaX, int deltaY){ x += deltaX; y += deltaY; updated = true; }
 	void Entity::move(SDL_Point* deltaPoint){ x += deltaPoint->x; y += deltaPoint->y; updated = true; }
+	SDL_Texture* Entity::getTexture(){ return hTexture; }
 
 	// Basic functionality
 	bool Entity::collides(Entity* entity){
