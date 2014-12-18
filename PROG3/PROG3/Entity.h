@@ -2,32 +2,30 @@
 #define ENTITY_H
 
 #include <SDL.h>
+#include "Sprite.h"
 
 namespace stain{
 	class Entity{
 	public:
 		int getSize();
 		void setSize(int newSize);
-		int getX();
-		int getY();
-		void setX(int newX);
-		void setY(int newY);
-		SDL_Point getPos();
-		void setPos(SDL_Point* newPos);
-		void move(int deltaX, int deltaY);
-		void move(SDL_Point* deltaPoint);
+		double getX();
+		double getY();
+		void setX(double newX);
+		void setY(double newY);
+		void move(double deltaX, double deltaY);
 		bool collides(Entity* entity);
-		SDL_Texture* getTexture();
+		Sprite* getSprite();
 		virtual void tick()=0;
 		virtual ~Entity();
 	protected:
-		int x;
-		int y;
+		double x;
+		double y;
 		int size;
-		bool updated;
-		SDL_Texture* hTexture;
+		unsigned int lastTick;
+		Sprite* sprite;
 
-		Entity(int x, int y, int size, SDL_Texture* texture = nullptr);
+		Entity(double x, double y, int size, Sprite* sprite = nullptr);
 		Entity(const Entity&);
 		const Entity& operator=(const Entity&);
 	};

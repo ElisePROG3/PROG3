@@ -8,33 +8,26 @@ int main(int argc, char* argv[])
 	stain::Stain game = stain::Stain();
 	// Init and show loading screen
 	game.init("Game!", 800, 600);
-	game.loadImage("data/images/StudioElise.png", "splash");
+	game.loadImage("splash", "data/images/StudioElise.png");
 	game.setOverlay("splash", 2000);
 
 	// Load resources
-	game.loadImage("data/images/mob.png", "mob");
+	game.loadImage("mob", "data/images/mob.png");
+	game.loadImage("level1", "data/images/grass_bg.png");
+	game.loadImage("player", "data/images/player.png", 100, 500);
 
-	stain::EntityHuman* p = stain::EntityHuman::getInstance(100, 100, 20, game.getTextureFromHandle("mob"));
-	game.addMobile(p);
-	game.addMobile(stain::EntityHuman::getInstance(200, 100, 20, game.getTextureFromHandle("mob")));
+	// Setup
+	stain::MapLevel map1 = stain::MapLevel("meadow", game.getTexture("level1"));
+
+	map1.addMobile(stain::EntityHuman::getInstance(300, 320, 20, game.getSprite("mob")));
+	map1.addMobile(stain::EntityHuman::getInstance(280, 190, 20, game.getSprite("mob")));
+
+	game.addLevel(&map1);
+	game.setPlayer(stain::EntityHuman::getInstance(250, 250, 20, game.getSprite("player")));
 
 	//game.setFPS(0);
 
-	SDL_Event event;
-	bool quit = false;
-	while (!quit){
-		while (SDL_PollEvent(&event) != 0){
-			if (event.type == SDL_QUIT){
-				quit = true;
-			}
-		}
-
-
-
-		//SDL_Delay(35);
-
-		game.render();
-	}
+	game.run();
 
 	return 0;
 }

@@ -85,13 +85,17 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityHuman.cpp" />
     <ClCompile Include="EntityLoot.cpp" />
+    <ClCompile Include="MapLevel.cpp" />
     <ClCompile Include="PROG3.cpp" />
+    <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Stain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityHuman.h" />
     <ClInclude Include="EntityLoot.h" />
+    <ClInclude Include="MapLevel.h" />
+    <ClInclude Include="Sprite.h" />
     <ClInclude Include="Stain.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

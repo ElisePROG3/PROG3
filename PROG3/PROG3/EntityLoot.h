@@ -7,11 +7,11 @@
 namespace stain{
 	class EntityLoot : public Entity {
 	public:
-		static EntityLoot* getInstance(int x, int y, int size, SDL_Texture* texture);
+		static EntityLoot* getInstance(int x, int y, int size, Sprite* sprite);
 		void tick();
 		~EntityLoot();
 	private:
-		EntityLoot(int x, int y, int size, SDL_Texture* texture);
+		EntityLoot(int x, int y, int size, Sprite* sprite);
 	};
 }
 #endif

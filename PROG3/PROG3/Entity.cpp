@@ -1,8 +1,8 @@
 #include "Entity.h"
 
 namespace stain{
-	Entity::Entity(int startX, int startY, int startSize, SDL_Texture* newTexture) : x(startX), y(startY), size(startSize), updated(true), hTexture(newTexture){
-
+	Entity::Entity(double startX, double startY, int startSize, Sprite* newSprite) : x(startX), y(startY), size(startSize), sprite(newSprite){
+		lastTick = SDL_GetTicks();
 	}
 
 	Entity::~Entity(){
@@ -11,21 +11,20 @@ namespace stain{
 
 	// Getters & Setters
 	int Entity::getSize(){ return size; }
-	void Entity::setSize(int newSize){ size = newSize; updated = true; }
-	int Entity::getX(){ return x; }
-	int Entity::getY(){ return y; }
-	void Entity::setX(int newX){ x = newX; updated = true; }
-	void Entity::setY(int newY){ y = newY; updated = true; }
-	SDL_Point Entity::getPos(){ return SDL_Point{x, y}; }
-	void Entity::setPos(SDL_Point* newPos){ x = newPos->x; y = newPos->y; updated = true; }
-	void Entity::move(int deltaX, int deltaY){ x += deltaX; y += deltaY; updated = true; }
-	void Entity::move(SDL_Point* deltaPoint){ x += deltaPoint->x; y += deltaPoint->y; updated = true; }
-	SDL_Texture* Entity::getTexture(){ return hTexture; }
+	void Entity::setSize(int newSize){ size = newSize; }
+	double Entity::getX(){ return x; }
+	double Entity::getY(){ return y; }
+	void Entity::setX(double newX){ x = newX; }
+	void Entity::setY(double newY){ y = newY; }
+	void Entity::move(double deltaX, double deltaY){ x += deltaX; y += deltaY; }
+	Sprite* Entity::getSprite(){
+		return sprite;
+	}
 
 	// Basic functionality
 	bool Entity::collides(Entity* entity){
-		int a = entity->getX() - x;
-		int b = entity->getY() - y;
+		double a = entity->getX() - x;
+		double b = entity->getY() - y;
 
 		double distance = SDL_sqrt(a*a + b*b);
 

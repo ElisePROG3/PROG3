@@ -15,20 +15,25 @@ namespace stain{
 					fps(60),
 					lastRenderTime(-1),
 					displayOverlay(nullptr),
-					overlayTime(-1)
+					overlayTime(-1),
+					player(nullptr),
+					activeLevel(nullptr)
 	{}
 
 	Stain::~Stain(){
 
 		// Destroy resources.
-		for each (Stain_IMG img in images){
-			SDL_DestroyTexture(img.hTexture);
+		for each (Sprite* sprite in images){
+			SDL_DestroyTexture(sprite->getTexture());
+			delete (sprite);
 		}
 
-		// Destroy mobiles
-		for each (Entity* mob in mobiles)
-		{
-			delete(mob);
+		// Destroy maps and their mobiles
+		for each (MapLevel* level in levels){
+			for each (Entity* mob in level->getMobiles()){
+				delete(mob);
+			}
+			delete(level);
 		}
 
 		// Close SDL
@@ -69,7 +74,7 @@ namespace stain{
 		return true;
 	}
 
-	bool Stain::loadImage(std::string filePath, std::string handleName){
+	bool Stain::loadImage(std::string handleName, std::string filePath, int frameSize, int animTime){
 		SDL_Texture* newTexture = nullptr;
 		SDL_Surface* loadedSurface = IMG_Load(filePath.c_str());
 		if (loadedSurface == nullptr){
@@ -84,8 +89,8 @@ namespace stain{
 			}
 			SDL_FreeSurface(loadedSurface);
 
-			Stain_IMG imgObj = { newTexture, handleName };
-			images.push_back(imgObj);
+			Sprite* sprite = new Sprite(handleName, newTexture, frameSize, animTime);
+			images.push_back(sprite);
 
 			return true;
 		}
@@ -99,7 +104,7 @@ namespace stain{
 			overlayTime = SDL_GetTicks() + timeToShowMs;
 		}
 
-		SDL_Texture* img = getTextureFromHandle(handle);
+		SDL_Texture* img = getTexture(handle);
 		if (img != nullptr){
 			displayOverlay = img;
 		}
@@ -108,10 +113,18 @@ namespace stain{
 		}
 	}
 
-	SDL_Texture* Stain::getTextureFromHandle(std::string handle){
-		for each (Stain_IMG img in images){
-			if (img.handle == handle)
-				return img.hTexture;
+	SDL_Texture* Stain::getTexture(std::string handle){
+		for each (Sprite* sprite in images){
+			if (sprite->getName() == handle)
+				return sprite->getTexture();
+		}
+		return nullptr;
+	}
+
+	Sprite* Stain::getSprite(std::string handle){
+		for each (Sprite* sprite in images){
+			if (sprite->getName() == handle)
+				return sprite;
 		}
 		return nullptr;
 	}
@@ -120,12 +133,13 @@ namespace stain{
 		fps = newFPS;
 	}
 
-	bool Stain::addMobile(Entity* entity){
-		if (entity != nullptr){
-			mobiles.push_back(entity);
-			return true;
+	void Stain::addLevel(MapLevel* level){
+		if (level != nullptr){
+			level->setViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+			levels.push_back(level);
+			if (activeLevel == nullptr)
+				activeLevel = level;
 		}
-		return false;
 	}
 
 	void Stain::render(){
@@ -136,15 +150,28 @@ namespace stain{
 			// Let's start with clearing the display.
 			SDL_RenderClear(hRndr);
 
-			// Let's render mobs
-			for each (Entity* mob in mobiles)
-			{
-				int w, h;
-				SDL_Texture* img = mob->getTexture();
-				SDL_QueryTexture(img, NULL, NULL, &w, &h);
-				SDL_Rect rect = { mob->getX(), mob->getY(), w, h };
-				SDL_RenderCopy(hRndr, img, nullptr, &rect);
+			// Let's render the map background of the current map
+			if (activeLevel->getTexture() != nullptr)
+				SDL_RenderCopy(hRndr, activeLevel->getTexture(), activeLevel->getViewport(), nullptr);
+
+			// Let's render mobs in current map
+
+			for each (Entity* mob in activeLevel->getMobiles()){
+				SDL_Rect* src = mob->getSprite()->getSourceRect();
+				SDL_Rect dst = { mob->getX(), mob->getY(), mob->getSprite()->getWidth(), mob->getSprite()->getHeight() };
+				SDL_RenderCopyEx(hRndr, mob->getSprite()->getTexture(), src, &dst, mob->getSprite()->getAngle(), nullptr, SDL_FLIP_NONE);
+				delete (src);
 			}
+
+			// Let's render the player
+			if (player != nullptr){
+				SDL_Rect* src = player->getSprite()->getSourceRect();
+				SDL_Rect dst = { player->getX(), player->getY(), player->getSprite()->getWidth(), player->getSprite()->getHeight() };
+				SDL_RenderCopyEx(hRndr, player->getSprite()->getTexture(), src, &dst, player->getSprite()->getAngle(), nullptr, SDL_FLIP_NONE);
+				delete (src);
+			}
+
+			// Let's render obstackles in current map.
 
 
 
@@ -160,4 +187,65 @@ namespace stain{
 			lastRenderTime = SDL_GetTicks();
 		}
 	}
+
+	void Stain::setPlayer(Entity* newPlayer){
+		player = newPlayer;
+	}
+
+	void Stain::setActiveLevel(std::string levelName){
+		for each (MapLevel* level in levels){
+			if (level->getName() == levelName){
+				activeLevel = level;
+				break;
+			}
+		}
+	}
+
+	void Stain::run(){
+		bool quit = false;
+		while (!quit){
+			while (SDL_PollEvent(&event) != 0){
+				switch (event.type){
+				case SDL_QUIT:
+					quit = true;
+					break;
+				case SDL_KEYDOWN:
+					switch (event.key.keysym.sym){
+					case SDLK_w:
+					case SDLK_UP:
+
+						break;
+					case SDLK_s:
+					case SDLK_DOWN:
+
+						break;
+					case SDLK_a:
+					case SDLK_LEFT:
+
+						break;
+					case SDLK_d:
+					case SDLK_RIGHT:
+
+						break;
+					}
+
+				}
+			}
+
+			//SDL_Delay(100);
+
+			// Mobiles heartbeat
+			for each (Entity* mob in activeLevel->getMobiles()){
+				mob->tick();
+			}
+
+			// Render screen
+			render();
+		}
+	}
+
+
+
+
+
 }

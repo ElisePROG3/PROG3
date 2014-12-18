@@ -2,14 +2,14 @@
 #include <string>
 
 namespace stain{
-	EntityLoot::EntityLoot(int newX, int newY, int newSize, SDL_Texture* newTexture) :Entity(newX, newY, newSize, newTexture){
+	EntityLoot::EntityLoot(int newX, int newY, int newSize, Sprite* newSprite) :Entity(newX, newY, newSize, newSprite){
 	}
 
 	EntityLoot::~EntityLoot(){
 	}
 
-	EntityLoot* EntityLoot::getInstance(int x, int y, int size, SDL_Texture* texture){
-		return new EntityLoot(x, y, size, texture);
+	EntityLoot* EntityLoot::getInstance(int x, int y, int size, Sprite* sprite){
+		return new EntityLoot(x, y, size, sprite);
 	}
 
 	void EntityLoot::tick(){
