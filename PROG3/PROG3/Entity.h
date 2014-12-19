@@ -1,8 +1,9 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include <SDL.h>
+#include "SDL.h"
 #include "Sprite.h"
+#include <vector>
 
 namespace stain{
 	class Entity{
@@ -14,9 +15,11 @@ namespace stain{
 		void setX(double newX);
 		void setY(double newY);
 		void move(double deltaX, double deltaY);
-		bool collides(Entity* entity);
 		Sprite* getSprite();
-		virtual void tick()=0;
+
+		bool collides(Entity* entity);
+		void draw(SDL_Renderer* hRenderer, SDL_Point offset);
+		virtual void tick(std::vector<Entity*> interactors) = 0;
 		virtual ~Entity();
 	protected:
 		double x;
@@ -26,8 +29,8 @@ namespace stain{
 		Sprite* sprite;
 
 		Entity(double x, double y, int size, Sprite* sprite = nullptr);
-		Entity(const Entity&);
-		const Entity& operator=(const Entity&);
+		//Entity(const Entity&);
+		//const Entity& operator=(const Entity&);
 	};
 }
 #endif

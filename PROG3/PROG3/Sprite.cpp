@@ -1,22 +1,28 @@
 #include "Sprite.h"
-#include <iostream>//debug
+
 namespace stain{
-	Sprite::Sprite(std::string newName, SDL_Texture* newTexture, int newFrameSize, int newAnimTime) :
-		name(newName),
-		hTexture(newTexture),
-		frameSize(newFrameSize),
-		animTime(newAnimTime),
+	Sprite::Sprite(std::string name, SDL_Texture* texture, int frameSize, int animTime) :
+		name(name),
+		hTexture(texture),
+		frameSize(frameSize),
+		animTime(animTime),
 		angle(0.0),
 		frameCount(1),
-		isAnimating(false)
+		isAnimating(false),
+		startTime(SDL_GetTicks())
 	{
-		startTime = SDL_GetTicks();
+		/*
+		*	Animated frames are assumed to be square, frameSize is both width and height of the frame.
+		*	If the image is not animated it doesn't need to be square.
+		*	A frameSize value of zero decides that it's not animated.
+		*	(frameSize is an optional argument of the constructor but it must be given, together with animTime, for animation to be relevant)
+		*/
 		int width;
-		SDL_QueryTexture(newTexture, nullptr, nullptr, &width, nullptr);
-		if (newFrameSize == 0){
+		SDL_QueryTexture(texture, nullptr, nullptr, &width, nullptr);
+		if (frameSize == 0){
 			frameCount = 1;
 		}else{
-			frameCount = width / newFrameSize;
+			frameCount = width / frameSize;
 			if (frameCount < 1) frameCount = 1;
 		}
 		if (frameCount > 1) isAnimating = true;
@@ -46,30 +52,36 @@ namespace stain{
 		return hTexture;
 	}
 
-	SDL_Rect* Sprite::getSourceRect(){
-		SDL_Rect* retval = new SDL_Rect();
+	SDL_Rect Sprite::getSourceRect(){
+		/*
+		*	Returns an SDL_Rect with dimensions to the frame that should be currently displayed.
+		*	If frameSize is zero then we're not animating and we should just return the dimensions to the texture.
+		*/
+		SDL_Rect retval;
 
 		if (frameSize == 0){
 			int w, h;
 			SDL_QueryTexture(hTexture, nullptr, nullptr, &w, &h);
 			
-			retval->x = 0;
-			retval->y = 0;
-			retval->w = w;
-			retval->h = h;
+			retval.x = 0;
+			retval.y = 0;
+			retval.w = w;
+			retval.h = h;
 		}else{
-			int frameNumber = (SDL_GetTicks() % animTime) % frameCount;
-		std::cout << SDL_GetTicks() % animTime << std::endl;
-			retval->x = (isAnimating) ? frameSize * (frameNumber ) : 0;
-			retval->y = 0;
-			retval->w = frameSize;
-			retval->h = frameSize;
+			int frameNumber = ((SDL_GetTicks() - startTime) / animTime) % frameCount;
+			retval.x = (isAnimating) ? frameSize * (frameNumber ) : 0;
+			retval.y = 0;
+			retval.w = frameSize;
+			retval.h = frameSize;
 		}
 
 		return retval;
 	}
 
 	int Sprite::getWidth(){
+		/*
+		*	Return the frameSize as the width, unless it's zero, then return the texture width;
+		*/
 		if (frameSize != 0)
 			return frameSize;
 
@@ -80,6 +92,9 @@ namespace stain{
 	}
 
 	int Sprite::getHeight(){
+		/*
+		*	Return the frameSize as the height, unless it's zero, then return the texture height;
+		*/
 		if (frameSize != 0)
 			return frameSize;
 

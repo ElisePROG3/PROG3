@@ -5,6 +5,7 @@
 #include <vector>
 #include "SDL.h"
 #include "Entity.h"
+#include "EntityHuman.h"
 #include "MapLevel.h"
 #include "Sprite.h"
 
@@ -23,7 +24,7 @@ namespace stain{
 		SDL_Texture* getTexture(std::string handle);
 		Sprite* getSprite(std::string handle);
 		void setFPS(int fps);
-		void setPlayer(Entity* player);
+		void addPlayer(EntityHuman* player);
 		void addLevel(MapLevel* level);
 		void setActiveLevel(std::string levelName);
 		void run();
@@ -38,19 +39,16 @@ namespace stain{
 		int lastRenderTime;
 		int overlayTime;
 		SDL_Texture* displayOverlay;
-		Entity* player;
+		std::vector<Entity*> players;	/* It's a list: for future support for multi-player. */
 		std::vector<MapLevel*> levels;
 		MapLevel* activeLevel;
 		SDL_Event event;
-
-		//struct Stain_IMG{
-		//	SDL_Texture* hTexture;
-		//	std::string handle;
-		//};
-		//std::vector<Stain_IMG> images;
+		SDL_Point mousePosition;
 		std::vector<Sprite*> images;
 
 		void render();
+		void setPlayerAngleAndMoving(bool up, bool down, bool left, bool right);
+		void setPlayerVisualAngle();
 	};
 }
 #endif

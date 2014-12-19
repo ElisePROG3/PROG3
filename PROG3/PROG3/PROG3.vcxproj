@@ -83,8 +83,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="EntityBug.cpp" />
     <ClCompile Include="EntityHuman.cpp" />
+    <ClCompile Include="EntityLiving.cpp" />
     <ClCompile Include="EntityLoot.cpp" />
+    <ClCompile Include="EntityProjectile.cpp" />
     <ClCompile Include="MapLevel.cpp" />
     <ClCompile Include="PROG3.cpp" />
     <ClCompile Include="Sprite.cpp" />
@@ -92,8 +95,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityBug.h" />
     <ClInclude Include="EntityHuman.h" />
+    <ClInclude Include="EntityLiving.h" />
     <ClInclude Include="EntityLoot.h" />
+    <ClInclude Include="EntityProjectile.h" />
     <ClInclude Include="MapLevel.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Stain.h" />

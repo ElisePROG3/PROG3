@@ -1,42 +1,41 @@
 #include "EntityHuman.h"
-#include <iostream>
-#include <math.h>
 
 namespace stain{
-	EntityHuman::EntityHuman(double newX, double newY, int newSize, Sprite* sprite) :Entity(newX, newY, newSize, sprite), speed(40), angle(7.0), isWalking(false){
-
+	EntityHuman::EntityHuman(double x, double y, int size, Sprite* sprite, double health, double speed, double angle) :
+		EntityLiving(x, y, size, sprite, health, speed, angle)
+	{
+		connectType = CONNECTION::LOCAL; /* For future use for multi-player */
+		this->sprite->stopAnimation();
 	}
 
 	EntityHuman::~EntityHuman(){
 
 	}
 
-	EntityHuman* EntityHuman::getInstance(double x, double y, int size, Sprite* sprite){
-		return new EntityHuman(x, y, size, sprite);
+	EntityHuman* EntityHuman::getInstance(double x, double y, int size, Sprite* sprite, double health, double speed, double angle){
+		return new EntityHuman(x, y, size, sprite, health, speed, angle);
 	}
 
-	void EntityHuman::tick(){
-		unsigned int deltaTime = SDL_GetTicks() - lastTick;
-		
-		AI();
+	void EntityHuman::tick(std::vector<Entity*> interactors){
+		EntityLiving::tick(interactors);
 
-		if (isWalking){
-			double magnitude = (deltaTime / 1000.0) * speed;
-			move(SDL_cos(angle) * magnitude, SDL_sin(angle) * magnitude);
-		}
-
-		lastTick = SDL_GetTicks();
 	}
 
 	void EntityHuman::AI(){
-		// Basic wandering with semi-randomness caused by system lag.
-		if (SDL_GetTicks() % 1000 == 0){
-			isWalking = !isWalking;
-			if (!isWalking) angle = (rand() % 10000 / 10000.0) * (2 * M_PI);
-		}
+		// This could be used for debuffs like panic or confusion.
 	}
 
-	void EntityHuman::setAngle(double newAngle){
-		angle = newAngle;
+	void EntityHuman::startMoving(){
+		_isMoving = true;
+		sprite->startAnimation();
+	}
+
+	void EntityHuman::stopMoving(){
+		_isMoving = false;
+		sprite->stopAnimation();
+	}
+
+	EntityHuman::CONNECTION EntityHuman::getNetworkConnectStatus(){
+		return connectType;
 	}
 }

@@ -7,36 +7,41 @@
 #include <iostream>
 
 namespace stain{
-	Stain::Stain() :hWnd(nullptr), 
-					hRndr(nullptr), 
-					WINDOW_TITLE("Window"), 
-					WINDOW_WIDTH(640), 
-					WINDOW_HEIGHT(480), 
-					fps(60),
-					lastRenderTime(-1),
-					displayOverlay(nullptr),
-					overlayTime(-1),
-					player(nullptr),
-					activeLevel(nullptr)
+	Stain::Stain() :hWnd(nullptr),
+		hRndr(nullptr),
+		WINDOW_TITLE("Window"),
+		WINDOW_WIDTH(640),
+		WINDOW_HEIGHT(480),
+		fps(60),
+		lastRenderTime(-1),
+		displayOverlay(nullptr),
+		overlayTime(-1),
+		activeLevel(nullptr)
 	{}
 
 	Stain::~Stain(){
 
-		// Destroy resources.
+		/* Destroy resources. */
 		for each (Sprite* sprite in images){
 			SDL_DestroyTexture(sprite->getTexture());
 			delete (sprite);
 		}
 
-		// Destroy maps and their mobiles
+		/* Destroy maps */
 		for each (MapLevel* level in levels){
-			for each (Entity* mob in level->getMobiles()){
-				delete(mob);
-			}
 			delete(level);
 		}
 
-		// Close SDL
+		/* Delete players */
+		for each (Entity* player in players)
+		{
+			delete(player);
+		}
+
+		/* Delete some misc variables */
+		
+
+		/* Close SDL */
 		SDL_DestroyRenderer(hRndr);
 		SDL_DestroyWindow(hWnd);
 		SDL_Quit();
@@ -52,6 +57,7 @@ namespace stain{
 		WINDOW_WIDTH = newWidth;
 		WINDOW_HEIGHT = newHeight;
 
+		//TODO: figure out if WINDOW_WIDTH/HEIGHT are inner- or outer dimensions.
 		hWnd = SDL_CreateWindow(WINDOW_TITLE.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
 		if (hWnd == nullptr) {
 			std::cout << "[SEVERE] Failed to create window. " << SDL_GetError();
@@ -69,12 +75,15 @@ namespace stain{
 			return false;
 		}
 
-		SDL_SetRenderDrawColor(hRndr, 0x20, 0xf5, 0xa2, 0xff);
+		SDL_SetRenderDrawColor(hRndr, 0x20, 0xf5, 0xa2, 0xff); // 'Tis just something random so I can see it.
 
 		return true;
 	}
 
 	bool Stain::loadImage(std::string handleName, std::string filePath, int frameSize, int animTime){
+		/*
+		*	Load an image from file, toss it into a Sprite class together with some meta-data and put the lot in a list.
+		*/
 		SDL_Texture* newTexture = nullptr;
 		SDL_Surface* loadedSurface = IMG_Load(filePath.c_str());
 		if (loadedSurface == nullptr){
@@ -97,6 +106,11 @@ namespace stain{
 	}
 
 	void Stain::setOverlay(std::string handle, int timeToShowMs){
+		/*
+		*	Display an overlay (an image; e.g. "splash screen", pause image, message board, etc.) over the screen.
+		*	timeToShowMs : how long, in milliseconds, to show the overlay. -1 is forever (untill manually closed).
+		*	To close/remove the overlay use a handle value that is not a valid handle e.g. nullptr.
+		*/
 		if (timeToShowMs == -1){
 			overlayTime = -1;
 		}
@@ -114,6 +128,10 @@ namespace stain{
 	}
 
 	SDL_Texture* Stain::getTexture(std::string handle){
+		/*
+		*	Iterates through the list of sprites and mathches handle to sprite name.
+		*	The texture of the sprite is returned when a match is found.
+		*/
 		for each (Sprite* sprite in images){
 			if (sprite->getName() == handle)
 				return sprite->getTexture();
@@ -122,6 +140,10 @@ namespace stain{
 	}
 
 	Sprite* Stain::getSprite(std::string handle){
+		/*
+		*	Iterates through the list of sprites, matching handle to sprite name.
+		*	The sprite is returned when a match is found.
+		*/
 		for each (Sprite* sprite in images){
 			if (sprite->getName() == handle)
 				return sprite;
@@ -135,64 +157,73 @@ namespace stain{
 
 	void Stain::addLevel(MapLevel* level){
 		if (level != nullptr){
+			/* Initialize the maps viewport to match the window dimensions */
 			level->setViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 			levels.push_back(level);
+			/* If we haven't chosen an active map let's do it now */
 			if (activeLevel == nullptr)
 				activeLevel = level;
 		}
 	}
 
 	void Stain::render(){
+		/*
+		*	Does all the rendering.
+		*/
 		int deltaMS = SDL_GetTicks() - lastRenderTime;
 		if (fps <= 0 || deltaMS >= 1000 / (float)fps){ // SDL_GetTicks is low resolution, FPS precision suffers.
 			if (false) std::cout << "FPS: " << (deltaMS == 0 ? "Through the roof!" : std::to_string(1000 / deltaMS)) << std::endl;	// FPS Debug
-			
-			// Let's start with clearing the display.
+
+			/* Let's start with clearing the display. */
 			SDL_RenderClear(hRndr);
 
-			// Let's render the map background of the current map
+			/* Let's render the map background of the current map */
 			if (activeLevel->getTexture() != nullptr)
 				SDL_RenderCopy(hRndr, activeLevel->getTexture(), activeLevel->getViewport(), nullptr);
 
-			// Let's render mobs in current map
-
+			/* Let's render all the mobs in the current map */
 			for each (Entity* mob in activeLevel->getMobiles()){
-				SDL_Rect* src = mob->getSprite()->getSourceRect();
-				SDL_Rect dst = { mob->getX(), mob->getY(), mob->getSprite()->getWidth(), mob->getSprite()->getHeight() };
-				SDL_RenderCopyEx(hRndr, mob->getSprite()->getTexture(), src, &dst, mob->getSprite()->getAngle(), nullptr, SDL_FLIP_NONE);
-				delete (src);
+				mob->draw(hRndr, activeLevel->getMapOffset());
 			}
 
-			// Let's render the player
-			if (player != nullptr){
-				SDL_Rect* src = player->getSprite()->getSourceRect();
-				SDL_Rect dst = { player->getX(), player->getY(), player->getSprite()->getWidth(), player->getSprite()->getHeight() };
-				SDL_RenderCopyEx(hRndr, player->getSprite()->getTexture(), src, &dst, player->getSprite()->getAngle(), nullptr, SDL_FLIP_NONE);
-				delete (src);
+			/* Let's render loot items in the current map */
+			for each (EntityLoot* loot in activeLevel->getLoot()){
+				loot->draw(hRndr, activeLevel->getMapOffset());
 			}
 
-			// Let's render obstackles in current map.
+			/* Let's render obstackles in the current map. */
 
 
+			/* Let's render the players */
+			for each (Entity* player in players){
+				player->draw(hRndr, activeLevel->getMapOffset());
+			}
 
-			// Let's handle any overlays.
+			/* Let's draw the GUI */
+
+
+			/* Let's handle the overlay. This should be rendered last so that it covers everything */
 			if (displayOverlay != nullptr){
 				SDL_RenderCopy(hRndr, displayOverlay, nullptr, nullptr);
-			if (overlayTime != -1 && overlayTime - (long int)SDL_GetTicks() <= 0)
+				if (overlayTime != -1 && overlayTime - (long int)SDL_GetTicks() <= 0)
 					displayOverlay = nullptr;
 			}
 
-			// Finally; present!
+			/* Finally; present! */
 			SDL_RenderPresent(hRndr);
 			lastRenderTime = SDL_GetTicks();
 		}
 	}
 
-	void Stain::setPlayer(Entity* newPlayer){
-		player = newPlayer;
+	void Stain::addPlayer(EntityHuman* newPlayer){
+		players.push_back(newPlayer);
+		activeLevel->focusEntity(newPlayer, true);
 	}
 
 	void Stain::setActiveLevel(std::string levelName){
+		/*
+		*	Picks the level/map from the list by matching levelName and makes it the active level/map.
+		*/
 		for each (MapLevel* level in levels){
 			if (level->getName() == levelName){
 				activeLevel = level;
@@ -202,7 +233,12 @@ namespace stain{
 	}
 
 	void Stain::run(){
+		/*
+		*	Main loop
+		*/
 		bool quit = false;
+		bool keyLeft = false, keyRight = false, keyUp = false, keyDown = false;
+
 		while (!quit){
 			while (SDL_PollEvent(&event) != 0){
 				switch (event.type){
@@ -213,38 +249,160 @@ namespace stain{
 					switch (event.key.keysym.sym){
 					case SDLK_w:
 					case SDLK_UP:
-
+						if (!keyUp){
+							keyUp = true;
+							setPlayerAngleAndMoving(keyUp, keyDown, keyLeft, keyRight);
+						}
 						break;
 					case SDLK_s:
 					case SDLK_DOWN:
-
+						if (!keyDown){
+							keyDown = true;
+							setPlayerAngleAndMoving(keyUp, keyDown, keyLeft, keyRight);
+						}
 						break;
 					case SDLK_a:
 					case SDLK_LEFT:
-
+						if (!keyLeft){
+							keyLeft = true;
+							setPlayerAngleAndMoving(keyUp, keyDown, keyLeft, keyRight);
+						}
 						break;
 					case SDLK_d:
 					case SDLK_RIGHT:
-
+						if (!keyRight){
+							keyRight = true;
+							setPlayerAngleAndMoving(keyUp, keyDown, keyLeft, keyRight);
+						}
 						break;
 					}
-
+					break;
+				case SDL_KEYUP:
+					switch (event.key.keysym.sym){
+					case SDLK_w:
+					case SDLK_UP:
+						if (keyUp){
+							keyUp = false;
+							setPlayerAngleAndMoving(keyUp, keyDown, keyLeft, keyRight);
+						}
+						break;
+					case SDLK_s:
+					case SDLK_DOWN:
+						if (keyDown){
+							keyDown = false;
+							setPlayerAngleAndMoving(keyUp, keyDown, keyLeft, keyRight);
+						}
+						break;
+					case SDLK_a:
+					case SDLK_LEFT:
+						if (keyLeft){
+							keyLeft = false;
+							setPlayerAngleAndMoving(keyUp, keyDown, keyLeft, keyRight);
+						}
+						break;
+					case SDLK_d:
+					case SDLK_RIGHT:
+						if (keyRight){
+							keyRight = false;
+							setPlayerAngleAndMoving(keyUp, keyDown, keyLeft, keyRight);
+						}
+					}
+					break;
+				case SDL_MOUSEMOTION:
+					/* Set the player's visual angle to point at the mouse cursor*/
+					mousePosition.x = event.motion.x;
+					mousePosition.y = event.motion.y;
+					setPlayerVisualAngle();
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					Entity* e = activeLevel->getMobiles()[0];
+					activeLevel->removeMobile(e);
+					break;
 				}
 			}
 
+
+
+
 			//SDL_Delay(100);
 
-			// Mobiles heartbeat
-			for each (Entity* mob in activeLevel->getMobiles()){
-				mob->tick();
+
+
+			/* Loot heartbeat */
+			for each (EntityLoot* loot in activeLevel->getLoot()){
+				loot->tick(players);
 			}
 
-			// Render screen
+			/* Mobiles heartbeat */
+			for each (Entity* mob in activeLevel->getMobiles()){
+				mob->tick(players);
+			}
+
+			/* Player heartbeat */
+			for each (EntityHuman* player in players){
+				player->tick(players);
+				if (player->isMoving()){
+					setPlayerVisualAngle();
+					activeLevel->focusEntity(player);
+				}
+			}
+
+			/* Render screen */
 			render();
 		}
 	}
 
+	void Stain::setPlayerAngleAndMoving(bool keyUp, bool keyDown, bool keyLeft, bool keyRight){
+		/*
+		*	Helper function:
+		*	Set the player (movement) angle depending on which keys (up, down, left, right) are pressed down
+		*	then start or stop moving.
+		*/
 
+		/* Let's get our local player */
+		EntityHuman* localPlayer = nullptr;
+		for each (EntityHuman* player in players){
+			if (player->getNetworkConnectStatus() == EntityHuman::CONNECTION::LOCAL){
+				localPlayer = player;
+				break;
+			}
+		}
+
+		if (localPlayer != nullptr){
+			if ((keyUp && !keyDown) || (keyDown && !keyUp) || (keyLeft && !keyRight) || (keyRight && !keyLeft)){
+				double ang = 0;
+
+				ang = keyUp ? ((M_PI * 1.5) + (M_PI / 4) * ((keyLeft && !keyRight) ? -1 : ((keyRight && !keyLeft) ? 1 : 0))) : (keyDown ? ((M_PI * 0.5) + (M_PI / 4) * ((keyLeft && !keyRight) ? 1 : ((keyRight && !keyLeft) ? -1 : 0))) : 0);
+				if (ang == 0){
+					ang = keyLeft ? (M_PI) : 0;
+				}
+				localPlayer->setAngle(ang);
+				if (!localPlayer->isMoving()) localPlayer->startMoving();
+			}
+			else{
+				localPlayer->stopMoving();
+			}
+		}
+	}
+
+	void Stain::setPlayerVisualAngle(){
+		/*
+		*	Helper function:
+		*	Set the visual angle of the player (sprite) so that it's aiming at the mouse cursor.
+		*/
+
+		/* Let's get our local player */
+		EntityHuman* localPlayer = nullptr;
+		for each (EntityHuman* player in players){
+			if (player->getNetworkConnectStatus() == EntityHuman::CONNECTION::LOCAL){
+				localPlayer = player;
+				break;
+			}
+		}
+		if (localPlayer != nullptr){
+			localPlayer->getSprite()->setAngle(SDL_atan2(localPlayer->getY() - activeLevel->getMapOffset().y - mousePosition.y, localPlayer->getX() - activeLevel->getMapOffset().x - mousePosition.x) * 180 / M_PI + 180); //TODO: the "+180" is image dependant; fix it!
+		}
+	}
 
 
 
