@@ -6,7 +6,8 @@ namespace stain{
 		y(y), 
 		size(size), 
 		sprite(new Sprite(*sprite)),
-		lastTick(SDL_GetTicks())
+		lastTick(SDL_GetTicks()),
+		dead(false)
 	{}
 
 	Entity::~Entity(){
@@ -22,6 +23,8 @@ namespace stain{
 	void Entity::setY(double newY){ y = newY; }
 	void Entity::move(double deltaX, double deltaY){ x += deltaX; y += deltaY; }
 	Sprite* Entity::getSprite(){ return sprite; }
+	bool Entity::isDead(){ return dead; }
+	void Entity::die(){ dead = true; }
 
 	/* Basic functionality */
 	bool Entity::collides(Entity* entity){

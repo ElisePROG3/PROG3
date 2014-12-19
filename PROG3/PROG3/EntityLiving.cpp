@@ -7,11 +7,13 @@ namespace stain{
 		healthMax(health),
 		speed(speed),
 		angle(angle),
-		doSyncAngles(false)
+		doSyncAngles(false),
+		_isMoving(false),
+		inventory(Inventory::getInstance())
 	{}
 
 	EntityLiving::~EntityLiving(){
-
+		delete(inventory);
 	}
 
 	double EntityLiving::getHealth(){
@@ -25,7 +27,11 @@ namespace stain{
 	void EntityLiving::setAngle(double angle){
 		this->angle = angle;
 		if (doSyncAngles)
-			sprite->setAngle(angle * 180 / M_PI - 90); /* Convert radians to degrees */ //TODO: the "-90" is specific to the image because it's looking up/north; handle this!
+			sprite->setAngle(angle * 180 / M_PI); /* Convert radians to degrees */
+	}
+
+	double EntityLiving::getAngle(){
+		return angle;
 	}
 
 	bool EntityLiving::isMoving(){
@@ -33,16 +39,20 @@ namespace stain{
 	}
 
 	void EntityLiving::syncVisualAngle(bool synchronize){
+		/*
+		*	Makes it so that the angle of the sprite (visual angle) matches the angle the entity is facing.
+		*/
 		doSyncAngles = synchronize;
 		if (synchronize)
-			sprite->setAngle(angle * 180 / M_PI - 90);
+			sprite->setAngle(angle * 180 / M_PI);
 	}
 
 	void EntityLiving::tick(std::vector<Entity*> interactors){
+		if (dead) return;
 		/* Execute sub-class AI and do movement. */
 		unsigned int deltaTime = SDL_GetTicks() - lastTick;
 
-		AI();
+		AI(interactors);
 
 		if (_isMoving){
 			double magnitude = (deltaTime / 1000.0) * speed;
@@ -50,5 +60,30 @@ namespace stain{
 		}
 
 		lastTick = SDL_GetTicks();
+	}
+
+	double EntityLiving::hurt(double amount){
+		health -= amount;
+		if (health < 0) health = 0;
+		if (health > healthMax) health = healthMax;
+
+		if (health == 0){
+			die();
+			// effect? sound?
+		}else{
+			// effect? sound?
+		}
+
+		return health;
+	}
+
+	double EntityLiving::heal(double amount){
+		health += amount;
+		if (health < 0) health = 0;
+		if (health > healthMax) health = healthMax;
+
+		// do stuff? sound?
+
+		return health;
 	}
 }

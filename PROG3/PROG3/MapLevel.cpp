@@ -1,13 +1,27 @@
 #include "MapLevel.h"
 #include <algorithm> // for remove_if
-#include <functional>
+#include "EntityLiving.h"
+
 namespace stain{
-	MapLevel::MapLevel(std::string name, SDL_Texture* playfield) :name(name), playfield(playfield){
+	MapLevel::MapLevel(std::string name, SDL_Texture* playfield):
+		name(name),
+		playfield(playfield)
+	{
+
 	}
 
 	MapLevel::~MapLevel(){
-		for each (Entity* mob in mobiles){
+		for each (EntityLiving* mob in mobiles){
+			for each (InventoryItem* item in mob->inventory->getItems()){
+				delete(item);
+			}
 			delete(mob);
+		}
+		for each (EntityLoot* loot in loots){
+			for each (InventoryItem* item in loot->getLootItems()){
+				delete(item);
+			}
+			delete(loot);
 		}
 	}
 
@@ -93,22 +107,39 @@ namespace stain{
 
 	void MapLevel::addLoot(EntityLoot* loot){
 		if (loot != nullptr)
-			this->loot.push_back(loot);
+			this->loots.push_back(loot);
 	}
 
 	void MapLevel::removeLoot(EntityLoot* loot){
-		
+		std::vector<EntityLoot*>::iterator itr;
+		for (itr = loots.begin(); itr != loots.end();){
+			if (*itr == loot){
+				itr = loots.erase(itr);
+				delete(loot);
+				break;
+			}
+			else
+				++itr;
+		}
 	}
 
 	std::vector<Entity*> MapLevel::getMobiles(){
 		return mobiles;
 	}
 	std::vector<EntityLoot*> MapLevel::getLoot(){
-		return loot;
+		return loots;
 	}
 
 	SDL_Point MapLevel::getMapOffset(){
 		SDL_Point p = { viewport.x, viewport.y };
 		return p;
+	}
+
+	void MapLevel::purgeDeadEntities(){
+		/*
+		*	Remove dead enities in mobiles and loots (by using remove_if and some lambda)
+		*/
+		mobiles.erase(std::remove_if(mobiles.begin(), mobiles.end(), [](Entity* mob){ return mob->isDead(); }), mobiles.end());
+		loots.erase(std::remove_if(loots.begin(), loots.end(), [](EntityLoot* loot){ return loot->isDead(); }), loots.end());
 	}
 }

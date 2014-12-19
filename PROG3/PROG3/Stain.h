@@ -6,6 +6,7 @@
 #include "SDL.h"
 #include "Entity.h"
 #include "EntityHuman.h"
+#include "EntityProjectile.h"
 #include "MapLevel.h"
 #include "Sprite.h"
 
@@ -19,7 +20,7 @@ namespace stain{
 		Stain();
 		~Stain();
 		bool init(std::string title = "Window", int width = 640, int height = 480);
-		bool loadImage(std::string handleName, std::string filePath, int frameSize = 0, int animTime = 0);
+		bool loadImage(std::string handleName, std::string filePath, Sprite::FACING face = Sprite::FACING::NONE, int frameSize = 0, int animTime = 0);
 		void setOverlay(std::string handle, int timeToShowMs = -1);
 		SDL_Texture* getTexture(std::string handle);
 		Sprite* getSprite(std::string handle);
@@ -41,6 +42,7 @@ namespace stain{
 		SDL_Texture* displayOverlay;
 		std::vector<Entity*> players;	/* It's a list: for future support for multi-player. */
 		std::vector<MapLevel*> levels;
+		std::vector<EntityProjectile*> projectiles;
 		MapLevel* activeLevel;
 		SDL_Event event;
 		SDL_Point mousePosition;

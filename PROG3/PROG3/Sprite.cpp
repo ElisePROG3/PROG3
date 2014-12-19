@@ -1,7 +1,7 @@
 #include "Sprite.h"
 
 namespace stain{
-	Sprite::Sprite(std::string name, SDL_Texture* texture, int frameSize, int animTime) :
+	Sprite::Sprite(std::string name, SDL_Texture* texture, FACING face, int frameSize, int animTime) :
 		name(name),
 		hTexture(texture),
 		frameSize(frameSize),
@@ -9,7 +9,8 @@ namespace stain{
 		angle(0.0),
 		frameCount(1),
 		isAnimating(false),
-		startTime(SDL_GetTicks())
+		startTime(SDL_GetTicks()),
+		angleAdjust(0.0)
 	{
 		/*
 		*	Animated frames are assumed to be square, frameSize is both width and height of the frame.
@@ -26,6 +27,8 @@ namespace stain{
 			if (frameCount < 1) frameCount = 1;
 		}
 		if (frameCount > 1) isAnimating = true;
+
+		setAngleAdjust(face);
 	}
 
 	Sprite::~Sprite(){
@@ -36,12 +39,48 @@ namespace stain{
 		return isAnimating;
 	}
 
-	void Sprite::setAngle(double inAngle){
-		angle = inAngle;
+	void Sprite::setAngle(double angleDegrees){
+		angle = angleDegrees + angleAdjust;
 	}
 
 	double Sprite::getAngle(){
 		return angle;
+	}
+
+	void Sprite::setAngleAdjust(double angleDegrees){
+		angleAdjust = angleDegrees;
+	}
+
+	void Sprite::setAngleAdjust(FACING face){
+		switch (face){
+		case FACING::EAST:
+			angleAdjust = 180;
+			break;
+		case FACING::NORTH:
+			angleAdjust = 90;
+			break;
+		case FACING::NORTHEAST:
+			angleAdjust = 135;
+			break;
+		case FACING::NORTHWEST:
+			angleAdjust = 45;
+			break;
+		case FACING::SOUTH:
+			angleAdjust = 270;
+			break;
+		case FACING::SOUTHEAST:
+			angleAdjust = 225;
+			break;
+		case FACING::SOUTHWEST:
+			angleAdjust = 315;
+			break;
+		case FACING::WEST:
+			angleAdjust = 0;
+			break;
+		default:
+			angleAdjust = 0;
+			break;
+		}
 	}
 
 	std::string Sprite::getName(){

@@ -1,6 +1,8 @@
 #include "Stain.h"
 #include "Entity.h"
 #include "EntityHuman.h"
+#include "Weapon.h"
+#include "WeaponGun.h"
 #include "SDL.h"
 #include "SDL_image.h"
 #include <string>
@@ -32,14 +34,18 @@ namespace stain{
 			delete(level);
 		}
 
-		/* Delete players */
-		for each (Entity* player in players)
-		{
-			delete(player);
+		/* Destroy projectiles */
+		for each (EntityProjectile* projectile in projectiles){
+			delete(projectile);
 		}
 
-		/* Delete some misc variables */
-		
+		/* Delete players */
+		for each (EntityLiving* player in players){
+			for each (InventoryItem* item in player->inventory->getItems()){
+				delete(item);
+			}
+			delete(player);
+		}
 
 		/* Close SDL */
 		SDL_DestroyRenderer(hRndr);
@@ -80,7 +86,7 @@ namespace stain{
 		return true;
 	}
 
-	bool Stain::loadImage(std::string handleName, std::string filePath, int frameSize, int animTime){
+	bool Stain::loadImage(std::string handleName, std::string filePath, Sprite::FACING face, int frameSize, int animTime){
 		/*
 		*	Load an image from file, toss it into a Sprite class together with some meta-data and put the lot in a list.
 		*/
@@ -98,7 +104,7 @@ namespace stain{
 			}
 			SDL_FreeSurface(loadedSurface);
 
-			Sprite* sprite = new Sprite(handleName, newTexture, frameSize, animTime);
+			Sprite* sprite = new Sprite(handleName, newTexture, face, frameSize, animTime);
 			images.push_back(sprite);
 
 			return true;
@@ -315,8 +321,38 @@ namespace stain{
 					setPlayerVisualAngle();
 					break;
 				case SDL_MOUSEBUTTONDOWN:
-					Entity* e = activeLevel->getMobiles()[0];
-					activeLevel->removeMobile(e);
+					
+					// Test stuff
+					/*
+					for each (Entity* mob in activeLevel->getMobiles())
+					{
+						mob->die();
+						break;
+					}
+					*/
+					EntityLiving* player = nullptr;
+					for each (EntityLiving* p in players){
+						player = p;
+						break;
+					}
+
+					Weapon* armedItem = (Weapon*)player->inventory->getSelectedItem();
+					
+					if (armedItem != nullptr){
+						EntityProjectile* projectile = armedItem->fire(player->getX(), player->getY(), player->getAngle() * 180 / M_PI);
+						if (projectile != nullptr){
+							projectiles.push_back(projectile);
+							std::cout << "Shoot!\n";
+						}
+						else{
+							std::cout << "null projectile\n";
+						}
+					}
+					else{
+						std::cout << "null gun\n";
+					}
+					
+					
 					break;
 				}
 			}
@@ -327,6 +363,8 @@ namespace stain{
 			//SDL_Delay(100);
 
 
+			/* Remove dead entities */
+			activeLevel->purgeDeadEntities();
 
 			/* Loot heartbeat */
 			for each (EntityLoot* loot in activeLevel->getLoot()){
@@ -340,7 +378,7 @@ namespace stain{
 
 			/* Player heartbeat */
 			for each (EntityHuman* player in players){
-				player->tick(players);
+				player->tick(activeLevel->getMobiles());
 				if (player->isMoving()){
 					setPlayerVisualAngle();
 					activeLevel->focusEntity(player);
@@ -400,7 +438,7 @@ namespace stain{
 			}
 		}
 		if (localPlayer != nullptr){
-			localPlayer->getSprite()->setAngle(SDL_atan2(localPlayer->getY() - activeLevel->getMapOffset().y - mousePosition.y, localPlayer->getX() - activeLevel->getMapOffset().x - mousePosition.x) * 180 / M_PI + 180); //TODO: the "+180" is image dependant; fix it!
+			localPlayer->getSprite()->setAngle(SDL_atan2(localPlayer->getY() - activeLevel->getMapOffset().y - mousePosition.y, localPlayer->getX() - activeLevel->getMapOffset().x - mousePosition.x) * 180 / M_PI);
 		}
 	}
 

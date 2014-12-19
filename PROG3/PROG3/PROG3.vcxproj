@@ -88,10 +88,15 @@
     <ClCompile Include="EntityLiving.cpp" />
     <ClCompile Include="EntityLoot.cpp" />
     <ClCompile Include="EntityProjectile.cpp" />
+    <ClCompile Include="EntityProjectileBullet.cpp" />
+    <ClCompile Include="Inventory.cpp" />
+    <ClCompile Include="InventoryItem.cpp" />
     <ClCompile Include="MapLevel.cpp" />
     <ClCompile Include="PROG3.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Stain.cpp" />
+    <ClCompile Include="Weapon.cpp" />
+    <ClCompile Include="WeaponGun.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h" />
@@ -100,9 +105,14 @@
     <ClInclude Include="EntityLiving.h" />
     <ClInclude Include="EntityLoot.h" />
     <ClInclude Include="EntityProjectile.h" />
+    <ClInclude Include="EntityProjectileBullet.h" />
+    <ClInclude Include="Inventory.h" />
+    <ClInclude Include="InventoryItem.h" />
     <ClInclude Include="MapLevel.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Stain.h" />
+    <ClInclude Include="Weapon.h" />
+    <ClInclude Include="WeaponGun.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

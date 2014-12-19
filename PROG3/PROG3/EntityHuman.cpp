@@ -2,9 +2,9 @@
 
 namespace stain{
 	EntityHuman::EntityHuman(double x, double y, int size, Sprite* sprite, double health, double speed, double angle) :
-		EntityLiving(x, y, size, sprite, health, speed, angle)
+		EntityLiving(x, y, size, sprite, health, speed, angle),
+		connectType(CONNECTION::LOCAL) /* For future use for multi-player */
 	{
-		connectType = CONNECTION::LOCAL; /* For future use for multi-player */
 		this->sprite->stopAnimation();
 	}
 
@@ -17,12 +17,13 @@ namespace stain{
 	}
 
 	void EntityHuman::tick(std::vector<Entity*> interactors){
+		if (dead) return;
 		EntityLiving::tick(interactors);
 
 	}
 
-	void EntityHuman::AI(){
-		// This could be used for debuffs like panic or confusion.
+	void EntityHuman::AI(std::vector<Entity*> interactors){
+		/* This could be used for debuffs like panic or confusion. */
 	}
 
 	void EntityHuman::startMoving(){

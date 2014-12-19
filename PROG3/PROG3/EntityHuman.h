@@ -24,7 +24,7 @@ namespace stain{
 
 		CONNECTION connectType;
 
-		void AI();
+		void AI(std::vector<Entity*> interactors);
 	};
 }
 #endif

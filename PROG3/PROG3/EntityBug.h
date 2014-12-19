@@ -13,7 +13,7 @@ namespace stain{
 	private:
 		EntityBug(double x, double y, int size, Sprite* sprite, double health, double speed, double angle);
 
-		void AI();
+		void AI(std::vector<Entity*> interactors);
 	};
 }
 #endif

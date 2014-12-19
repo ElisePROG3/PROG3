@@ -24,12 +24,13 @@ namespace stain{
 		std::vector<EntityLoot*> getLoot();
 		std::string getName();
 		SDL_Point getMapOffset();
+		void purgeDeadEntities();
 	private:
 		MapLevel(std::string name, SDL_Texture* playfield);
 		SDL_Texture* playfield;
 		SDL_Rect viewport;
 		std::vector<Entity*> mobiles;
-		std::vector<EntityLoot*> loot;
+		std::vector<EntityLoot*> loots;
 		std::string name;
 	};
 }

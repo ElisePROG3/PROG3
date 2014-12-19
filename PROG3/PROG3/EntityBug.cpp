@@ -17,11 +17,12 @@ namespace stain{
 	}
 
 	void EntityBug::tick(std::vector<Entity*> interactors){
+		if (dead) return;
 		EntityLiving::tick(interactors);
 
 	}
 
-	void EntityBug::AI(){
+	void EntityBug::AI(std::vector<Entity*> interactors){
 		// Basic wandering with semi-randomness caused by system lag.
 		if (SDL_GetTicks() % 1000 == 0){
 			_isMoving = !_isMoving;

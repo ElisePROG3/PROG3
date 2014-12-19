@@ -16,6 +16,8 @@ namespace stain{
 		void setY(double newY);
 		void move(double deltaX, double deltaY);
 		Sprite* getSprite();
+		bool isDead();
+		void die();
 
 		bool collides(Entity* entity);
 		void draw(SDL_Renderer* hRenderer, SDL_Point offset);
@@ -27,6 +29,7 @@ namespace stain{
 		int size;
 		unsigned int lastTick;
 		Sprite* sprite;
+		bool dead;
 
 		Entity(double x, double y, int size, Sprite* sprite = nullptr);
 		//Entity(const Entity&);

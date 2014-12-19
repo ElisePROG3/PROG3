@@ -1,8 +1,8 @@
-﻿Build started fr 19 dec 2014 13:37:02.
+﻿Build started lö 20 dec 2014 00:50:00.
      1>Project "C:\Users\Zelda\Documents\GitHub\PROG3\PROG3\PROG3\PROG3.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\SDL2-2.0.3\include" /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt EntityProjectile.cpp
-         EntityProjectile.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\SDL2-2.0.3\include" /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt WeaponGun.cpp
+         WeaponGun.cpp
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Zelda\Documents\GitHub\PROG3\PROG3\Debug\PROG3.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\SDL2-2.0.3\lib\x86" SDL2_image.lib SDL2.lib SDL2main.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Zelda\Documents\GitHub\PROG3\PROG3\Debug\PROG3.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Zelda\Documents\GitHub\PROG3\PROG3\Debug\PROG3.lib" /MACHINE:X86 Debug\Entity.obj
          Debug\EntityBug.obj
@@ -10,14 +10,18 @@
          Debug\EntityLiving.obj
          Debug\EntityLoot.obj
          Debug\EntityProjectile.obj
+         Debug\EntityProjectileBullet.obj
+         Debug\Inventory.obj
+         Debug\InventoryItem.obj
          Debug\MapLevel.obj
          Debug\PROG3.obj
          Debug\Sprite.obj
          Debug\Stain.obj
-     1>MSVCRTD.lib(cinitexe.obj) : warning LNK4098: defaultlib 'msvcrt.lib' conflicts with use of other libs; use /NODEFAULTLIB:library
+         Debug\Weapon.obj
+         Debug\WeaponGun.obj
          PROG3.vcxproj -> C:\Users\Zelda\Documents\GitHub\PROG3\PROG3\Debug\PROG3.exe
      1>Done Building Project "C:\Users\Zelda\Documents\GitHub\PROG3\PROG3\PROG3\PROG3.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.73
+Time Elapsed 00:00:00.74

@@ -8,7 +8,6 @@ namespace stain{
 	class Sprite
 	{
 	public:
-		Sprite(std::string name, SDL_Texture* texture, int frameSize = 0, int animTime = 0);
 		~Sprite();
 		void setAngle(double angleDegrees);
 		double getAngle();
@@ -20,8 +19,25 @@ namespace stain{
 		void startAnimation();
 		bool isAnimated();
 		std::string getName();
+		void setAngleAdjust(double angleDegrees);
+
+		enum class FACING{
+			NONE,
+			NORTH,
+			SOUTH,
+			EAST,
+			WEST,
+			NORTHEAST,
+			NORTHWEST,
+			SOUTHEAST,
+			SOUTHWEST
+		};
+
+		void setAngleAdjust(FACING face);
+		Sprite(std::string name, SDL_Texture* texture, FACING face = FACING::NONE, int frameSize = 0, int animTime = 0);
 	private:
 		double angle;
+		double angleAdjust;	/* Characters in sprites can face different directions, use this to adjust the angle accordingly */
 		int frameSize;
 		int frameCount;
 		int animTime;
