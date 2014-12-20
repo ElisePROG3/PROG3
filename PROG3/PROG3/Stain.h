@@ -20,10 +20,7 @@ namespace stain{
 		Stain();
 		~Stain();
 		bool init(std::string title = "Window", int width = 640, int height = 480);
-		bool loadImage(std::string handleName, std::string filePath, Sprite::FACING face = Sprite::FACING::NONE, int frameSize = 0, int animTime = 0);
 		void setOverlay(std::string handle, int timeToShowMs = -1);
-		SDL_Texture* getTexture(std::string handle);
-		Sprite* getSprite(std::string handle);
 		void setFPS(int fps);
 		void addPlayer(EntityHuman* player);
 		void addLevel(MapLevel* level);
@@ -46,7 +43,6 @@ namespace stain{
 		MapLevel* activeLevel;
 		SDL_Event event;
 		SDL_Point mousePosition;
-		std::vector<Sprite*> images;
 
 		void render();
 		void setPlayerAngleAndMoving(bool up, bool down, bool left, bool right);

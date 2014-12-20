@@ -1,12 +1,13 @@
 #include "EntityProjectileBullet.h"
 #include "EntityLiving.h"
+#include "Assets.h"
 
 namespace stain{
 	EntityProjectileBullet::EntityProjectileBullet(double x, double y, double angle) :
-		EntityProjectile(x, y, 4, sprite, 400, angle)
+		EntityProjectile(x, y, 4, Assets::getSprite("bullet"), 1400, angle)
 	{
-		//sprite = Stain.getSpprite("bullet");	// fix this. maybe add static ResourceLoader ?
 		damage = 10;
+		timeToLive = 10000;
 	}
 
 	EntityProjectileBullet::~EntityProjectileBullet(){

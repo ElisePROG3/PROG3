@@ -63,6 +63,12 @@
     <ClCompile Include="InventoryItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Assets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Obstacle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stain.h">
@@ -105,6 +111,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="InventoryItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Obstacle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,10 +5,15 @@ namespace stain{
 		x(x), 
 		y(y), 
 		size(size), 
-		sprite(new Sprite(*sprite)),
 		lastTick(SDL_GetTicks()),
 		dead(false)
-	{}
+	{
+		if (sprite != nullptr){
+			this->sprite = new Sprite(*sprite);
+		}else{
+			this->sprite = nullptr;
+		}
+	}
 
 	Entity::~Entity(){
 		delete (sprite);
@@ -44,8 +49,14 @@ namespace stain{
 	}
 
 	void Entity::draw(SDL_Renderer* hRenderer, SDL_Point offset){
-		SDL_Rect src = getSprite()->getSourceRect();
-		SDL_Rect dst = { (int)(getX() - getSprite()->getWidth() / 2) - offset.x, (int)(getY() - getSprite()->getHeight() / 2) - offset.y, getSprite()->getWidth(), getSprite()->getHeight() };
-		SDL_RenderCopyEx(hRenderer, getSprite()->getTexture(), &src, &dst, getSprite()->getAngle(), nullptr, SDL_FLIP_NONE);
+		Sprite* sprite = getSprite();
+
+		if (sprite != nullptr){
+			SDL_Rect src = sprite->getSourceRect();
+			SDL_Rect dst = { (int)(getX() - sprite->getWidth() / 2) - offset.x, (int)(getY() - sprite->getHeight() / 2) - offset.y, sprite->getWidth(), sprite->getHeight() };
+			SDL_RenderCopyEx(hRenderer, sprite->getTexture(), &src, &dst, sprite->getAngle(), nullptr, SDL_FLIP_NONE);
+		}else{
+			// Draw default texture ?
+		}
 	}
 }

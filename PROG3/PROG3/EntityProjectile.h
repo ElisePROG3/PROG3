@@ -19,6 +19,8 @@ namespace stain{
 		double angle;
 		double speed;
 		bool _isMoving;
+		unsigned int timeToLive;
+		unsigned int startTime;
 
 		virtual void AI(std::vector<Entity*> interactors) = 0;
 	};

@@ -7,6 +7,8 @@
 #include "SDL_image.h"
 #include <string>
 #include <iostream>
+#include "Assets.h"
+#include <algorithm> // for remove_if
 
 namespace stain{
 	Stain::Stain() :hWnd(nullptr),
@@ -24,10 +26,7 @@ namespace stain{
 	Stain::~Stain(){
 
 		/* Destroy resources. */
-		for each (Sprite* sprite in images){
-			SDL_DestroyTexture(sprite->getTexture());
-			delete (sprite);
-		}
+		Assets::deleteAssets();
 
 		/* Destroy maps */
 		for each (MapLevel* level in levels){
@@ -81,34 +80,10 @@ namespace stain{
 			return false;
 		}
 
+		Assets::setRenderer(hRndr);
 		SDL_SetRenderDrawColor(hRndr, 0x20, 0xf5, 0xa2, 0xff); // 'Tis just something random so I can see it.
 
 		return true;
-	}
-
-	bool Stain::loadImage(std::string handleName, std::string filePath, Sprite::FACING face, int frameSize, int animTime){
-		/*
-		*	Load an image from file, toss it into a Sprite class together with some meta-data and put the lot in a list.
-		*/
-		SDL_Texture* newTexture = nullptr;
-		SDL_Surface* loadedSurface = IMG_Load(filePath.c_str());
-		if (loadedSurface == nullptr){
-			std::cout << "[WARNING] Cannot load image (" << filePath << "). " << IMG_GetError();
-			return false;
-		}
-		else{
-			newTexture = SDL_CreateTextureFromSurface(hRndr, loadedSurface);
-			if (newTexture == nullptr) {
-				std::cout << "[WARNING] Unable to create texture from image (" << filePath << "). " << SDL_GetError();
-				return false;
-			}
-			SDL_FreeSurface(loadedSurface);
-
-			Sprite* sprite = new Sprite(handleName, newTexture, face, frameSize, animTime);
-			images.push_back(sprite);
-
-			return true;
-		}
 	}
 
 	void Stain::setOverlay(std::string handle, int timeToShowMs){
@@ -124,37 +99,13 @@ namespace stain{
 			overlayTime = SDL_GetTicks() + timeToShowMs;
 		}
 
-		SDL_Texture* img = getTexture(handle);
+		SDL_Texture* img = Assets::getTexture(handle);
 		if (img != nullptr){
 			displayOverlay = img;
 		}
 		else{
 			displayOverlay = nullptr;
 		}
-	}
-
-	SDL_Texture* Stain::getTexture(std::string handle){
-		/*
-		*	Iterates through the list of sprites and mathches handle to sprite name.
-		*	The texture of the sprite is returned when a match is found.
-		*/
-		for each (Sprite* sprite in images){
-			if (sprite->getName() == handle)
-				return sprite->getTexture();
-		}
-		return nullptr;
-	}
-
-	Sprite* Stain::getSprite(std::string handle){
-		/*
-		*	Iterates through the list of sprites, matching handle to sprite name.
-		*	The sprite is returned when a match is found.
-		*/
-		for each (Sprite* sprite in images){
-			if (sprite->getName() == handle)
-				return sprite;
-		}
-		return nullptr;
 	}
 
 	void Stain::setFPS(int newFPS){
@@ -183,24 +134,32 @@ namespace stain{
 			/* Let's start with clearing the display. */
 			SDL_RenderClear(hRndr);
 
-			/* Let's render the map background of the current map */
+			/* Let's draw the map background of the current map */
 			if (activeLevel->getTexture() != nullptr)
 				SDL_RenderCopy(hRndr, activeLevel->getTexture(), activeLevel->getViewport(), nullptr);
+
+			/* Let's draw projectiles */
+			for each (EntityProjectile* projectile in projectiles){
+				projectile->draw(hRndr, activeLevel->getMapOffset());
+			}
 
 			/* Let's render all the mobs in the current map */
 			for each (Entity* mob in activeLevel->getMobiles()){
 				mob->draw(hRndr, activeLevel->getMapOffset());
 			}
 
-			/* Let's render loot items in the current map */
+			/* Let's draw loot items in the current map */
 			for each (EntityLoot* loot in activeLevel->getLoot()){
 				loot->draw(hRndr, activeLevel->getMapOffset());
 			}
 
-			/* Let's render obstackles in the current map. */
+			/* Let's draw obstacles in the current map. */
 
 
-			/* Let's render the players */
+			/* Let's draw portals in the current map */
+
+
+			/* Let's draw the players */
 			for each (Entity* player in players){
 				player->draw(hRndr, activeLevel->getMapOffset());
 			}
@@ -339,10 +298,10 @@ namespace stain{
 					Weapon* armedItem = (Weapon*)player->inventory->getSelectedItem();
 					
 					if (armedItem != nullptr){
-						EntityProjectile* projectile = armedItem->fire(player->getX(), player->getY(), player->getAngle() * 180 / M_PI);
+						EntityProjectile* projectile = armedItem->fire(player->getX(), player->getY(), player->getSprite()->getAngle() * M_PI / 180);
 						if (projectile != nullptr){
 							projectiles.push_back(projectile);
-							std::cout << "Shoot!\n";
+							std::cout << "Shoot! (" << projectiles.size() << ")\n";
 						}
 						else{
 							std::cout << "null projectile\n";
@@ -364,7 +323,13 @@ namespace stain{
 
 
 			/* Remove dead entities */
+			projectiles.erase(std::remove_if(projectiles.begin(), projectiles.end(), [](EntityProjectile* projectile){ return projectile->isDead(); }), projectiles.end());
 			activeLevel->purgeDeadEntities();
+
+			/* Projectiles heartbeat */
+			for each (EntityProjectile* projectile in projectiles){
+				projectile->tick(activeLevel->getMobiles());
+			}
 
 			/* Loot heartbeat */
 			for each (EntityLoot* loot in activeLevel->getLoot()){

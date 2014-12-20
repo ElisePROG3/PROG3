@@ -5,7 +5,9 @@ namespace stain{
 		Entity(x, y, size, sprite),
 		damage(1),
 		speed(speed),
-		angle(angle)
+		angle(angle),
+		timeToLive(-1),
+		startTime(SDL_GetTicks())
 	{
 		_isMoving = true;
 	}
@@ -25,6 +27,11 @@ namespace stain{
 
 	void EntityProjectile::tick(std::vector<Entity*> interactors){
 		if (dead) return;
+		if (timeToLive != -1 && SDL_GetTicks() > startTime + timeToLive){
+			die();
+			return;
+		}
+
 		/* Execute sub-class AI and do movement. */
 		unsigned int deltaTime = SDL_GetTicks() - lastTick;
 

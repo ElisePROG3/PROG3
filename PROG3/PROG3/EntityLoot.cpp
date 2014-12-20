@@ -21,7 +21,7 @@ namespace stain{
 
 	void EntityLoot::tick(std::vector<Entity*> interactors){
 		if (dead) return;
-		if (SDL_GetTicks() > startTime + timeToLive){
+		if (timeToLive != -1 && SDL_GetTicks() > startTime + timeToLive){
 			die();
 			return;
 		}
