@@ -11,17 +11,22 @@
 #include <algorithm> // for remove_if
 
 namespace stain{
-	Stain::Stain() :hWnd(nullptr),
-		hRndr(nullptr),
-		WINDOW_TITLE("Window"),
-		WINDOW_WIDTH(640),
-		WINDOW_HEIGHT(480),
-		fps(60),
-		lastRenderTime(-1),
-		displayOverlay(nullptr),
-		overlayTime(-1),
-		activeLevel(nullptr)
-	{}
+	Stain::Stain() :
+		hWnd(nullptr),					/* Handle to the SDL window */
+		hRndr(nullptr),					/* Handle to the SDL renderer */
+		WINDOW_TITLE("Window"),			/* Window name */
+		WINDOW_WIDTH(640),				/* Window width */
+		WINDOW_HEIGHT(480),				/* Window height */
+		fps(60),						/* How often the playfield should be rendered */
+		lastRenderTime(-1),				/* Holds the time in ticks since the playfield was rendered last time. Used for rate (FPS) limiting */
+		activeLevel(nullptr)			/* A pointer to the current level */
+	{
+		/* Set defualt keys */
+		keyboard[KEYEVENT::MOVE_UP] = SDLK_w;
+		keyboard[KEYEVENT::MOVE_DOWN] = SDLK_s;
+		keyboard[KEYEVENT::MOVE_LEFT] = SDLK_a;
+		keyboard[KEYEVENT::MOVE_RIGHT] = SDLK_d;
+	}
 
 	Stain::~Stain(){
 
@@ -53,6 +58,12 @@ namespace stain{
 	}
 
 	bool Stain::init(std::string newTitle, int newWidth, int newHeight){
+		/*
+		*	Initiation.
+		*	Init SDL, the window and the renderer.
+		*	Prepare SDL_IMG to load PNG image format.
+		*	Give renderer to Assets and set some default values.
+		*/
 		if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0){
 			std::cout << "[SEVERE] Failed to initialize SDL. " << SDL_GetError();
 			return false;
@@ -92,19 +103,18 @@ namespace stain{
 		*	timeToShowMs : how long, in milliseconds, to show the overlay. -1 is forever (untill manually closed).
 		*	To close/remove the overlay use a handle value that is not a valid handle e.g. nullptr.
 		*/
-		if (timeToShowMs == -1){
-			overlayTime = -1;
-		}
-		else{
-			overlayTime = SDL_GetTicks() + timeToShowMs;
+
+		int oTime;
+
+		if (timeToShowMs < 0){
+			oTime = -1;
+		}else{
+			oTime = SDL_GetTicks() + timeToShowMs;
 		}
 
 		SDL_Texture* img = Assets::getTexture(handle);
 		if (img != nullptr){
-			displayOverlay = img;
-		}
-		else{
-			displayOverlay = nullptr;
+			displayOverlay.push_back({ img, oTime });
 		}
 	}
 
@@ -117,6 +127,7 @@ namespace stain{
 			/* Initialize the maps viewport to match the window dimensions */
 			level->setViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 			levels.push_back(level);
+
 			/* If we haven't chosen an active map let's do it now */
 			if (activeLevel == nullptr)
 				activeLevel = level;
@@ -128,7 +139,7 @@ namespace stain{
 		*	Does all the rendering.
 		*/
 		int deltaMS = SDL_GetTicks() - lastRenderTime;
-		if (fps <= 0 || deltaMS >= 1000 / (float)fps){ // SDL_GetTicks is low resolution, FPS precision suffers.
+		if (fps <= 0 || deltaMS >= 1000 / (float)fps){ // Note: SDL_GetTicks is low resolution, FPS precision suffers.
 			if (false) std::cout << "FPS: " << (deltaMS == 0 ? "Through the roof!" : std::to_string(1000 / deltaMS)) << std::endl;	// FPS Debug
 
 			/* Let's start with clearing the display. */
@@ -157,7 +168,9 @@ namespace stain{
 
 
 			/* Let's draw portals in the current map */
-
+			for each (Portal* portal in activeLevel->getPortals()){
+				portal->draw(hRndr, activeLevel->getMapOffset());
+			}
 
 			/* Let's draw the players */
 			for each (Entity* player in players){
@@ -167,11 +180,11 @@ namespace stain{
 			/* Let's draw the GUI */
 
 
-			/* Let's handle the overlay. This should be rendered last so that it covers everything */
-			if (displayOverlay != nullptr){
-				SDL_RenderCopy(hRndr, displayOverlay, nullptr, nullptr);
-				if (overlayTime != -1 && overlayTime - (long int)SDL_GetTicks() <= 0)
-					displayOverlay = nullptr;
+			/* Let's handle the overlay(s). This should be rendered last so that it covers everything */
+			if (!displayOverlay.empty()){
+				SDL_RenderCopy(hRndr, displayOverlay.front().img, nullptr, nullptr);
+				if (displayOverlay.front().time != -1 && displayOverlay.front().time - (long int)SDL_GetTicks() <= 0)
+					displayOverlay.erase(displayOverlay.begin());
 			}
 
 			/* Finally; present! */
@@ -181,8 +194,10 @@ namespace stain{
 	}
 
 	void Stain::addPlayer(EntityHuman* newPlayer){
-		players.push_back(newPlayer);
-		activeLevel->focusEntity(newPlayer, true);
+		if (newPlayer){
+			players.push_back(newPlayer);
+			activeLevel->focusEntity(newPlayer, true);
+		}
 	}
 
 	void Stain::setActiveLevel(std::string levelName){
@@ -197,11 +212,18 @@ namespace stain{
 		}
 	}
 
+	void Stain::setKey(KEYEVENT event, char letter){
+		/*
+		*	Set custom keys for actions.
+		*/
+		keyboard[event] = SDL_GetKeyFromName(&letter);
+	}
+
 	void Stain::run(){
 		/*
 		*	Main loop
 		*/
-		bool quit = false;
+		bool quit = false, gameOver = false;
 		bool keyLeft = false, keyRight = false, keyUp = false, keyDown = false;
 
 		while (!quit){
@@ -211,62 +233,53 @@ namespace stain{
 					quit = true;
 					break;
 				case SDL_KEYDOWN:
-					switch (event.key.keysym.sym){
-					case SDLK_w:
-					case SDLK_UP:
+					if (event.key.keysym.sym == keyboard[KEYEVENT::MOVE_UP]){
 						if (!keyUp){
 							keyUp = true;
 							setPlayerAngleAndMoving(keyUp, keyDown, keyLeft, keyRight);
 						}
-						break;
-					case SDLK_s:
-					case SDLK_DOWN:
+					}
+					if (event.key.keysym.sym == keyboard[KEYEVENT::MOVE_DOWN]){
 						if (!keyDown){
 							keyDown = true;
 							setPlayerAngleAndMoving(keyUp, keyDown, keyLeft, keyRight);
 						}
-						break;
-					case SDLK_a:
-					case SDLK_LEFT:
+					}
+					if (event.key.keysym.sym == keyboard[KEYEVENT::MOVE_LEFT]){
 						if (!keyLeft){
 							keyLeft = true;
 							setPlayerAngleAndMoving(keyUp, keyDown, keyLeft, keyRight);
 						}
-						break;
-					case SDLK_d:
-					case SDLK_RIGHT:
+					}
+					if (event.key.keysym.sym == keyboard[KEYEVENT::MOVE_RIGHT]){
 						if (!keyRight){
 							keyRight = true;
 							setPlayerAngleAndMoving(keyUp, keyDown, keyLeft, keyRight);
 						}
-						break;
 					}
+					
 					break;
 				case SDL_KEYUP:
-					switch (event.key.keysym.sym){
-					case SDLK_w:
-					case SDLK_UP:
+					if (event.key.keysym.sym == keyboard[KEYEVENT::MOVE_UP]){
 						if (keyUp){
 							keyUp = false;
 							setPlayerAngleAndMoving(keyUp, keyDown, keyLeft, keyRight);
 						}
-						break;
-					case SDLK_s:
-					case SDLK_DOWN:
+					}
+
+					if (event.key.keysym.sym == keyboard[KEYEVENT::MOVE_DOWN]){
 						if (keyDown){
 							keyDown = false;
 							setPlayerAngleAndMoving(keyUp, keyDown, keyLeft, keyRight);
 						}
-						break;
-					case SDLK_a:
-					case SDLK_LEFT:
+					}
+					if (event.key.keysym.sym == keyboard[KEYEVENT::MOVE_LEFT]){
 						if (keyLeft){
 							keyLeft = false;
 							setPlayerAngleAndMoving(keyUp, keyDown, keyLeft, keyRight);
 						}
-						break;
-					case SDLK_d:
-					case SDLK_RIGHT:
+					}
+					if (event.key.keysym.sym == keyboard[KEYEVENT::MOVE_RIGHT]){
 						if (keyRight){
 							keyRight = false;
 							setPlayerAngleAndMoving(keyUp, keyDown, keyLeft, keyRight);
@@ -281,27 +294,29 @@ namespace stain{
 					break;
 				case SDL_MOUSEBUTTONDOWN:
 					
-					// Test stuff
-					/*
-					for each (Entity* mob in activeLevel->getMobiles())
-					{
-						mob->die();
-						break;
-					}
-					*/
-					EntityLiving* player = nullptr;
-					for each (EntityLiving* p in players){
-						player = p;
-						break;
+					/* Handle overlays that need clicking */
+					if (!displayOverlay.empty() && !gameOver){
+						if (displayOverlay.front().time == -1)
+							displayOverlay.erase(displayOverlay.begin());
 					}
 
-					Weapon* armedItem = (Weapon*)player->inventory->getSelectedItem();
+					/* Handle user clicks, fire weapons etc */
+					/* Let's get our local player */
+					EntityHuman* localPlayer = nullptr;
+					for each (EntityHuman* player in players){
+						if (player->getNetworkConnectStatus() == EntityHuman::CONNECTION::LOCAL){
+							localPlayer = player;
+							break;
+						}
+					}
+
+					Weapon* armedItem = (Weapon*)localPlayer->inventory->getSelectedItem();
 					
 					if (armedItem != nullptr){
-						EntityProjectile* projectile = armedItem->fire(player->getX(), player->getY(), player->getSprite()->getAngle() * M_PI / 180);
+						EntityProjectile* projectile = armedItem->fire(localPlayer->getX(), localPlayer->getY(), localPlayer->getSprite()->getAngle() * M_PI / 180);
 						if (projectile != nullptr){
 							projectiles.push_back(projectile);
-							std::cout << "Shoot! (" << projectiles.size() << ")\n";
+							std::cout << "Shoot! (p: " << projectiles.size() << " | e: " << activeLevel->getMobiles().size() << ")\n";
 						}
 						else{
 							std::cout << "null projectile\n";
@@ -311,42 +326,61 @@ namespace stain{
 						std::cout << "null gun\n";
 					}
 					
-					
 					break;
 				}
 			}
 
+			/* Tick() only if no overlay is displayed */
+			if (displayOverlay.size() == 0){
+				/* Remove dead entities */
+				projectiles.erase(std::remove_if(projectiles.begin(), projectiles.end(), [](EntityProjectile* projectile){ return projectile->isDead(); }), projectiles.end());
+				activeLevel->purgeDeadEntities();
 
+				/* Projectiles heartbeat */
+				for each (EntityProjectile* projectile in projectiles){
+					projectile->tick(activeLevel->getMobiles());
+				}
 
+				/* Loot heartbeat */
+				for each (EntityLoot* loot in activeLevel->getLoot()){
+					loot->tick(players);
+				}
 
-			//SDL_Delay(100);
+				/* Mobiles heartbeat */
+				for each (Entity* mob in activeLevel->getMobiles()){
+					mob->tick(players);
+				}
 
+				/* Player heartbeat */
+				for each (EntityHuman* player in players){
+					player->tick(activeLevel->getMobiles());
+					if (player->isMoving()){
+						setPlayerVisualAngle();
+						activeLevel->focusEntity(player);
+					}
+				}
 
-			/* Remove dead entities */
-			projectiles.erase(std::remove_if(projectiles.begin(), projectiles.end(), [](EntityProjectile* projectile){ return projectile->isDead(); }), projectiles.end());
-			activeLevel->purgeDeadEntities();
+				/* Portal heartbeat */
+				for each (Portal* portal in activeLevel->getPortals()){
+					std::string doWarp = "";
+					portal->tick(players, doWarp);
+					if (!doWarp.empty()){
+						setActiveLevel(doWarp);
+						players.front()->setX(700);		// Ran out of time - quick fix.
+						players.front()->setY(300);
+						break;
+					}
+				}
 
-			/* Projectiles heartbeat */
-			for each (EntityProjectile* projectile in projectiles){
-				projectile->tick(activeLevel->getMobiles());
-			}
-
-			/* Loot heartbeat */
-			for each (EntityLoot* loot in activeLevel->getLoot()){
-				loot->tick(players);
-			}
-
-			/* Mobiles heartbeat */
-			for each (Entity* mob in activeLevel->getMobiles()){
-				mob->tick(players);
-			}
-
-			/* Player heartbeat */
-			for each (EntityHuman* player in players){
-				player->tick(activeLevel->getMobiles());
-				if (player->isMoving()){
-					setPlayerVisualAngle();
-					activeLevel->focusEntity(player);
+				/* Check win condition */
+				int mobCount = 0;
+				for each (MapLevel* level in levels){
+					mobCount += level->getMobiles().size();
+				}
+				if (mobCount == 0 && !gameOver){
+					std::cout << "You win!\n";
+					setOverlay("victory");
+					gameOver = true;
 				}
 			}
 

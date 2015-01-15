@@ -17,7 +17,7 @@ namespace stain{
 
 	}
 
-	int Weapon::getAmmoCount(){
+	int Weapon::getAmmoCount() const {
 		return ammoCount;
 	}
 

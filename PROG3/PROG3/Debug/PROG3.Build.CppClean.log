@@ -1,5 +1,6 @@
 c:\users\zelda\documents\github\prog3\prog3\prog3\debug\vc120.pdb
 c:\users\zelda\documents\github\prog3\prog3\prog3\debug\vc120.idb
+c:\users\zelda\documents\github\prog3\prog3\prog3\debug\assets.obj
 c:\users\zelda\documents\github\prog3\prog3\prog3\debug\entity.obj
 c:\users\zelda\documents\github\prog3\prog3\prog3\debug\entitybug.obj
 c:\users\zelda\documents\github\prog3\prog3\prog3\debug\entityhuman.obj
@@ -9,13 +10,14 @@ c:\users\zelda\documents\github\prog3\prog3\prog3\debug\entityprojectile.obj
 c:\users\zelda\documents\github\prog3\prog3\prog3\debug\entityprojectilebullet.obj
 c:\users\zelda\documents\github\prog3\prog3\prog3\debug\inventory.obj
 c:\users\zelda\documents\github\prog3\prog3\prog3\debug\inventoryitem.obj
-c:\users\zelda\documents\github\prog3\prog3\prog3\debug\maplevel.obj
 c:\users\zelda\documents\github\prog3\prog3\prog3\debug\prog3.obj
 c:\users\zelda\documents\github\prog3\prog3\prog3\debug\sprite.obj
 c:\users\zelda\documents\github\prog3\prog3\prog3\debug\stain.obj
 c:\users\zelda\documents\github\prog3\prog3\prog3\debug\weapon.obj
 c:\users\zelda\documents\github\prog3\prog3\prog3\debug\weapongun.obj
-c:\users\zelda\documents\github\prog3\prog3\prog3\debug\assets.obj
+c:\users\zelda\documents\github\prog3\prog3\prog3\debug\obstacle.obj
+c:\users\zelda\documents\github\prog3\prog3\prog3\debug\maplevel.obj
+c:\users\zelda\documents\github\prog3\prog3\prog3\debug\portal.obj
 c:\users\zelda\documents\github\prog3\prog3\debug\prog3.ilk
 c:\users\zelda\documents\github\prog3\prog3\debug\prog3.exe
 c:\users\zelda\documents\github\prog3\prog3\debug\prog3.pdb

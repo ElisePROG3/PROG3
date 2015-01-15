@@ -21,7 +21,7 @@ namespace stain{
 		sprite->setAngle(angle * 180 / M_PI); /* Convert radians to degrees */
 	}
 
-	bool EntityProjectile::isMoving(){
+	bool EntityProjectile::isMoving() const {
 		return _isMoving;
 	}
 

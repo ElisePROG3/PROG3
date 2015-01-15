@@ -94,6 +94,7 @@
     <ClCompile Include="InventoryItem.cpp" />
     <ClCompile Include="MapLevel.cpp" />
     <ClCompile Include="Obstacle.cpp" />
+    <ClCompile Include="Portal.cpp" />
     <ClCompile Include="PROG3.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Stain.cpp" />
@@ -113,6 +114,7 @@
     <ClInclude Include="InventoryItem.h" />
     <ClInclude Include="MapLevel.h" />
     <ClInclude Include="Obstacle.h" />
+    <ClInclude Include="Portal.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Stain.h" />
     <ClInclude Include="Weapon.h" />

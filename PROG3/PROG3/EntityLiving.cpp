@@ -16,11 +16,11 @@ namespace stain{
 		delete(inventory);
 	}
 
-	double EntityLiving::getHealth(){
+	double EntityLiving::getHealth() const {
 		return health;
 	}
 
-	double EntityLiving::getHealthMax(){
+	double EntityLiving::getHealthMax() const {
 		return healthMax;
 	}
 
@@ -30,11 +30,11 @@ namespace stain{
 			sprite->setAngle(angle * 180 / M_PI); /* Convert radians to degrees */
 	}
 
-	double EntityLiving::getAngle(){
+	double EntityLiving::getAngle() const {
 		return angle;
 	}
 
-	bool EntityLiving::isMoving(){
+	bool EntityLiving::isMoving() const {
 		return _isMoving;
 	}
 

@@ -11,7 +11,7 @@ namespace stain{
 	public:
 		virtual ~Weapon();
 		virtual EntityProjectile* fire(double x, double y, double angle) = 0;
-		int getAmmoCount();
+		int getAmmoCount() const;
 		void reload();
 	protected:
 		Weapon(std::string name, Sprite* sprite);

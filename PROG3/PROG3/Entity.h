@@ -8,15 +8,15 @@
 namespace stain{
 	class Entity{
 	public:
-		int getSize();
+		int getSize() const;
 		void setSize(int newSize);
-		double getX();
-		double getY();
+		double getX() const;
+		double getY() const;
 		void setX(double newX);
 		void setY(double newY);
 		void move(double deltaX, double deltaY);
-		Sprite* getSprite();
-		bool isDead();
+		Sprite* getSprite() const;
+		bool isDead() const;
 		void die();
 
 		bool collides(Entity* entity);

@@ -23,6 +23,9 @@ namespace stain{
 			}
 			delete(loot);
 		}
+		for each (Portal* portal in portals){
+			delete(portal);
+		}
 	}
 
 	MapLevel* MapLevel::getInstance(std::string name, SDL_Texture* playfield){
@@ -40,11 +43,11 @@ namespace stain{
 		return &viewport;
 	}
 
-	SDL_Texture* MapLevel::getTexture(){
+	SDL_Texture* MapLevel::getTexture() const {
 		return playfield;
 	}
 
-	std::string MapLevel::getName(){
+	std::string MapLevel::getName() const {
 		return name;
 	}
 
@@ -123,14 +126,37 @@ namespace stain{
 		}
 	}
 
-	std::vector<Entity*> MapLevel::getMobiles(){
+	void MapLevel::addPortal(Portal* portal){
+		if (portal != nullptr)
+			this->portals.push_back(portal);
+	}
+
+	void MapLevel::removePortal(Portal* portal){
+		std::vector<Portal*>::iterator itr;
+		for (itr = portals.begin(); itr != portals.end();){
+			if (*itr == portal){
+				itr = portals.erase(itr);
+				delete(portal);
+				break;
+			}
+			else
+				++itr;
+		}
+	}
+
+	std::vector<Entity*> MapLevel::getMobiles() const {
 		return mobiles;
 	}
-	std::vector<EntityLoot*> MapLevel::getLoot(){
+	
+	std::vector<EntityLoot*> MapLevel::getLoot() const {
 		return loots;
 	}
 
-	SDL_Point MapLevel::getMapOffset(){
+	std::vector<Portal*> MapLevel::getPortals() const {
+		return portals;
+	}
+
+	SDL_Point MapLevel::getMapOffset() const {
 		SDL_Point p = { viewport.x, viewport.y };
 		return p;
 	}

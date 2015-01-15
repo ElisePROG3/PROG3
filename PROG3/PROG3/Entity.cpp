@@ -20,15 +20,15 @@ namespace stain{
 	}
 
 	/* Getters & Setters */
-	int Entity::getSize(){ return size; }
+	int Entity::getSize() const { return size; }
 	void Entity::setSize(int newSize){ size = newSize; }
-	double Entity::getX(){ return x; }
-	double Entity::getY(){ return y; }
+	double Entity::getX() const { return x; }
+	double Entity::getY() const { return y; }
 	void Entity::setX(double newX){ x = newX; }
 	void Entity::setY(double newY){ y = newY; }
 	void Entity::move(double deltaX, double deltaY){ x += deltaX; y += deltaY; }
-	Sprite* Entity::getSprite(){ return sprite; }
-	bool Entity::isDead(){ return dead; }
+	Sprite* Entity::getSprite() const { return sprite; }
+	bool Entity::isDead() const { return dead; }
 	void Entity::die(){ dead = true; }
 
 	/* Basic functionality */

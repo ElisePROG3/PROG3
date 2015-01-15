@@ -4,7 +4,7 @@
 namespace stain{
 	class InventoryItem{
 	public:
-		int invAmount();
+		int invAmount() const;
 		void invAmount(int setAmount);
 		virtual ~InventoryItem();
 	protected:

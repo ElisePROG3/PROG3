@@ -10,15 +10,15 @@ namespace stain{
 	public:
 		~Sprite();
 		void setAngle(double angleDegrees);
-		double getAngle();
-		SDL_Rect getSourceRect();
-		int getWidth();
-		int getHeight();
-		SDL_Texture* getTexture();
+		double getAngle() const;
+		SDL_Rect getSourceRect() const;
+		int getWidth() const;
+		int getHeight() const;
+		SDL_Texture* getTexture() const;
 		void stopAnimation();
 		void startAnimation();
-		bool isAnimated();
-		std::string getName();
+		bool isAnimated() const;
+		std::string getName() const;
 		void setAngleAdjust(double angleDegrees);
 
 		enum class FACING{

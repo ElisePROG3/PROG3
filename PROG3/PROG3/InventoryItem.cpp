@@ -11,7 +11,7 @@ namespace stain{
 
 	}
 
-	int InventoryItem::invAmount(){
+	int InventoryItem::invAmount() const {
 		return amount;
 	}
 

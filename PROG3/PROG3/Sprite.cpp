@@ -35,7 +35,7 @@ namespace stain{
 
 	}
 
-	bool Sprite::isAnimated(){
+	bool Sprite::isAnimated() const {
 		return isAnimating;
 	}
 
@@ -43,7 +43,7 @@ namespace stain{
 		angle = angleDegrees + angleAdjust;
 	}
 
-	double Sprite::getAngle(){
+	double Sprite::getAngle() const {
 		return angle;
 	}
 
@@ -83,15 +83,15 @@ namespace stain{
 		}
 	}
 
-	std::string Sprite::getName(){
+	std::string Sprite::getName() const {
 		return name;
 	}
 
-	SDL_Texture* Sprite::getTexture(){
+	SDL_Texture* Sprite::getTexture() const {
 		return hTexture;
 	}
 
-	SDL_Rect Sprite::getSourceRect(){
+	SDL_Rect Sprite::getSourceRect() const {
 		/*
 		*	Returns an SDL_Rect with dimensions to the frame that should be currently displayed.
 		*	If frameSize is zero then we're not animating and we should just return the dimensions to the texture.
@@ -117,7 +117,7 @@ namespace stain{
 		return retval;
 	}
 
-	int Sprite::getWidth(){
+	int Sprite::getWidth() const {
 		/*
 		*	Return the frameSize as the width, unless it's zero, then return the texture width;
 		*/
@@ -130,7 +130,7 @@ namespace stain{
 		return w;
 	}
 
-	int Sprite::getHeight(){
+	int Sprite::getHeight() const {
 		/*
 		*	Return the frameSize as the height, unless it's zero, then return the texture height;
 		*/

@@ -55,7 +55,7 @@ namespace stain{
 		}
 	}
 
-	std::vector<InventoryItem*> Inventory::getItems(){
+	std::vector<InventoryItem*> Inventory::getItems() const {
 		return items;
 	}
 
@@ -67,7 +67,7 @@ namespace stain{
 		return vectorIndex;
 	}
 
-	InventoryItem* Inventory::getSelectedItem(){
+	InventoryItem* Inventory::getSelectedItem() const {
 		return selectedItem;
 	}
 }

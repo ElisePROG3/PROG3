@@ -1,5 +1,6 @@
 #include "EntityBug.h"
 #include <math.h>
+#include <iostream>
 
 namespace stain{
 	EntityBug::EntityBug(double x, double y, int size, Sprite* sprite, double health, double speed, double angle) :
@@ -27,6 +28,10 @@ namespace stain{
 		if (SDL_GetTicks() % 1000 == 0){
 			_isMoving = !_isMoving;
 			if (_isMoving) setAngle((rand() % 10000 / 10000.0) * (2 * M_PI));
+		}
+
+		if (collides(interactors.front())){
+			std::cout << "Enemy attack" << std::endl;
 		}
 	}
 }

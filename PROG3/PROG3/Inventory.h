@@ -12,9 +12,9 @@ namespace stain{
 
 		void addItem(InventoryItem* item);
 		void removeItem(InventoryItem* item, bool deleteEntireStack = false);
-		std::vector<InventoryItem*> getItems();
+		std::vector<InventoryItem*> getItems() const;
 		int setSelectedItem(int index);
-		InventoryItem* getSelectedItem();
+		InventoryItem* getSelectedItem() const;
 	private:
 		Inventory();
 

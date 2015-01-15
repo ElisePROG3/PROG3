@@ -7,7 +7,7 @@
 namespace stain{
 	class EntityBug : public EntityLiving{
 	public:
-		static EntityBug* getInstance(double x, double y, int size, Sprite* sprite, double health = 50, double speed = 50, double angle = 5);
+		static EntityBug* getInstance(double x, double y, int size, Sprite* sprite, double health = 20, double speed = 50, double angle = 5);
 		void tick(std::vector<Entity*> interactors);
 		~EntityBug();
 	private:

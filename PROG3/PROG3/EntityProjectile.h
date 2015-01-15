@@ -9,7 +9,7 @@ namespace stain{
 	public:
 		virtual void tick(std::vector<Entity*> interactors);
 		void setAngle(double angleRadians);
-		bool isMoving();
+		bool isMoving() const;
 
 		virtual ~EntityProjectile();
 	protected:

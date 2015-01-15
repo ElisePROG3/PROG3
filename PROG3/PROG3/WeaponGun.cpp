@@ -8,7 +8,7 @@ namespace stain{
 		fireRateTime = 100;
 		magazineSize = 6;
 		autoFire = 1;
-		ammoCount = 999;	// temp for testing
+		ammoCount = 9999;	// temp for testing
 	}
 
 	WeaponGun::~WeaponGun()

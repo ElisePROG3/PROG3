@@ -9,12 +9,12 @@ namespace stain{
 	public:
 		virtual ~EntityLiving();
 
-		double getHealth();
-		double getHealthMax();
+		double getHealth() const;
+		double getHealthMax() const;
 		void setAngle(double angleRadians);
-		double getAngle();
+		double getAngle() const;
 		void tick(std::vector<Entity*> interactors);
-		bool isMoving();
+		bool isMoving() const;
 		void syncVisualAngle(bool synchronize);
 		double hurt(double amount);
 		double heal(double amount);
